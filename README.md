@@ -1,141 +1,151 @@
-# CHPaper
+# CHextension_CHPaper_quadaFork
 
-Gives access to API available in Paper but not Bukkit or Spigot.
+> An **AI-assisted fork** of the CommandHelper (MethodScript) extension [CHPaper](https://github.com/PseudoKnight/CHPaper).
+> It exposes Paper-only server APIs as MethodScript functions and events. All upstream functions and events are kept; one event is added.
 
-## Recommended Builds
+> ⚠ **This is an unofficial fork** and is not affiliated with the original author. The changes were written with an AI coding tool (Claude Code)
+> and verified by the maintainer on a live server (Purpur 1.21.8). Please make sure a problem is not caused by this fork before reporting it upstream.
 
-CHPaper 0.4.x requires CommandHelper 3.3.5 #256 or later (Paper 1.16.5+) (NOTE: some functions require later Paper versions)  
-CHPaper 0.3.x requires CommandHelper 3.3.4 (Paper 1.13.2 - 1.16.5)  
-CHPaper 0.2.1 requires CommandHelper 3.3.2 (Paper 1.7.10 - 1.12.2)  
+## At a glance
 
-## Function Documentation
+| Item | Value |
+|---|---|
+| Version | `0.4.4-but-ai-edited.1` — suffix added to tell it apart from upstream 0.4.4 |
+| Based on | upstream `master` `b6eea66` |
+| CommandHelper | 3.3.5-SNAPSHOT (build 649 or later — `AbstractGenericEvent` API) |
+| Server | Paper-based 1.20.4+ (in use: Purpur 1.21.8) |
+| Java | build with 21 (source `release 16`) |
 
-#### UUID get_firework_shooter(fireworkUUID)
-Returns the UUID for the entity that spawned this firework, or null if none exists.
+## Changes from upstream
 
-#### int get_world_view_distance(world)
-Returns the view distance (in chunks) for a world.
+### 1. New event `entity_add_to_world`
 
-#### void set_world_view_distance(world, distance)
-Sets the view distance (in chunks) for a world.
+Paper's `EntityAddToWorldEvent` — fired any time an entity is added to a world for any reason. It is the counterpart of upstream's `entity_remove_from_world`.
 
-#### int get_command_block_success(location)
-Gets the success count for a commandblock. (1.17)
+| Field | Content |
+|---|---|
+| Prefilters | `id` — entity UUID string · `type` — entity type (macro) |
+| Event data | `id` — entity UUID · `type` — entity type |
+| Mutable fields | none |
 
-#### void set_command_block_success(location, int)
-Sets the success count for a commandblock. (1.17)
+```
+bind('entity_add_to_world', null, array(type: 'ZOMBIE'), @e) {
+    console('A zombie was added: '.@e['id'])
+}
+```
 
-#### void minimessage([recipient(s)], message)
-Sends a MiniMessage formatted message. (requires Paper 1.18.2+)
+### 2. Events now extend `AbstractGenericEvent`
 
-#### boolean get_paffects_spawning([player])
-Gets whether or not this player affects mob spawning.
+Upstream extended `AbstractEvent` and filtered each event with `instanceof`.
+They now use CommandHelper 3.3.5's newer `AbstractGenericEvent<…>` API — behaviour is unchanged.
 
-#### void set_paffects_spawning([player], boolean)
-Sets whether or not this player affects mob spawning.
+### 3. No duplicate listeners on reload
 
-#### pview_distance([player])
-Gets view distance for player in chunks.
+`PaperListeners.register` unregisters first if it is already registered. `unregister` does nothing if it was never registered.
 
-#### set_pview_distance([player], distance)
-Sets view distance for player in chunks. (2 - 32)
+### 4. `paper-api` is `provided`
 
-### World Mob Spawning Control
-These functions are not Paper-specific and will likely be moved to CommandHelper core at some point under different function names. I forgot to remove them before publishing, but enjoy them for now.
+The Paper API is not bundled into the built jar.
 
-#### array get_spawning(world)
-Gets the entity spawn settings for this world.
+## Build
 
-#### void set_spawning(world, settingsArray)
-Sets the entity spawn settings for this world.
+The Maven Wrapper is included — no separate Maven install is needed (JDK 21).
 
-### Mob Management
+CommandHelper is not on a public Maven repository, so install the full jar from Jenkins into your local Maven repository once (the jar in `libs/` — it is not committed):
 
-#### boolean set_mob_destination(entityID, destination, [speedMultiplier])
-Finds and sets a path for a mob to a location or living entity.
+```
+.\mvnw.cmd install:install-file "-Dfile=libs/commandhelper-3.3.5-SNAPSHOT-full.jar" "-DgroupId=com.sk89q" "-DartifactId=commandhelper" "-Dversion=3.3.5-SNAPSHOT" "-Dclassifier=full" "-Dpackaging=jar"
+```
 
-#### array get_mob_path(entityID)
-Returns an array of location arrays along the mob's current path or null.
+Download: https://letsbuild.net/jenkins/job/CommandHelper/lastSuccessfulBuild/artifact/target/commandhelper-3.3.5-SNAPSHOT-full.jar
 
-## Event Documentation
+```
+.\mvnw.cmd package
+```
 
-### beacon_effect
+Output `target/chpaper-<version>.jar` → put it in the server's `plugins/CommandHelper/extensions/` (remove any old CHPaper jar first — both would load).
 
-This event is called when beacon effect is applied to a player.
+## Upstream documentation
 
-#### Event Data
+The upstream function and event documentation is kept as-is in [`README.upstream.md`](README.upstream.md).
 
-* **player:** The player the effect is being applied to.
-* **location:** The location of the beacon.
-* **effect:** The array of the potion effect being applied to the player.
-* **primary:** Whether or not the effect is the primary effect from the beacon.
+## License
 
-#### Mutable Fields
+**MIT** (`LICENSE` — unchanged from upstream · Copyright (c) 2019 Michael Smith).
 
-* **effect**
+---
 
-### player_jump
+# 한국어
 
-This event is called when a player jumps.
+> CommandHelper(MethodScript) 확장 [CHPaper](https://github.com/PseudoKnight/CHPaper)를 **AI 도구로 수정한 포크**다.
+> Paper 서버에만 있는 API 를 MethodScript 함수 · 이벤트로 연다. 원본 함수 · 이벤트는 그대로 두고 이벤트 하나를 더했다.
 
-#### Prefilters
+> ⚠ **비공식 포크다.** 원본 제작자와 관련이 없다. 수정은 AI 코딩 도구(Claude Code)로 작성했고
+> 유지보수자가 실제 서버(Purpur 1.21.8)에서 확인했다. 원본에 문제를 알리기 전에 이 포크 때문인지 먼저 확인해 달라.
 
-* **player:** String
+## 한눈에
 
-#### Event Data
+| 항목 | 값 |
+|---|---|
+| 버전 | `0.4.4-but-ai-edited.1` — 원본 0.4.4 와 구분하려고 붙인 꼬리 |
+| 기준 | 원본 `master` `b6eea66` |
+| CommandHelper | 3.3.5-SNAPSHOT (빌드 649 이후 — `AbstractGenericEvent` API) |
+| 서버 | Paper 계열 1.20.4+ (실사용: Purpur 1.21.8) |
+| Java | 빌드 21 (소스 `release 16`) |
 
-* **player:** The player jumping.
-* **from:** The location from which the player is jumping.
-* **to:** The location the player is moving to.
+## 원본 대비 변경 사항
 
-#### Mutable Fields
+### 1. 새 이벤트 `entity_add_to_world`
 
-* **from**
+Paper 의 `EntityAddToWorldEvent` — 엔티티가 어떤 이유로든 월드에 더해질 때 불린다. 원본의 `entity_remove_from_world` 짝이다.
 
-### player_elytra_boost
+| 칸 | 내용 |
+|---|---|
+| 프리필터 | `id` — 엔티티 UUID 문자열 · `type` — 엔티티 종류(매크로) |
+| 이벤트 데이터 | `id` — 엔티티 UUID · `type` — 엔티티 종류 |
+| 바꿀 수 있는 값 | 없음 |
 
-This event is called when a player boosts using a firework while gliding.
+```
+bind('entity_add_to_world', null, array(type: 'ZOMBIE'), @e) {
+    console('좀비가 들어왔다: '.@e['id'])
+}
+```
 
-#### Prefilters
+### 2. 이벤트 클래스를 `AbstractGenericEvent` 로
 
-* **player:** String
+원본은 `AbstractEvent` 를 상속하고 이벤트마다 `instanceof` 로 걸렀다.
+CommandHelper 3.3.5 의 새 API `AbstractGenericEvent<…>` 로 바꿨다 — 동작은 같다.
 
-#### Event Data
+### 3. 리로드 때 리스너가 겹치지 않게
 
-* **player:** The player boosting.
-* **firework:** The entity id of the firework created.
-* **item:** The item array of the firework used.
-* **consume:** Whether or not the firework item will be consumed.
+`PaperListeners.register` 가 이미 등록돼 있으면 먼저 풀고 다시 단다. `unregister` 는 등록 전이면 아무것도 하지 않는다.
 
-#### Mutable Fields
+### 4. `paper-api` 를 `provided` 로
 
-* **consume**
+빌드 jar 에 Paper API 가 섞이지 않는다.
 
-### entity_remove_from_world
+## 빌드
 
-Fired any time an entity is being removed from a world for any reason
+Maven Wrapper 를 넣어 두었다 — Maven 을 따로 설치하지 않아도 된다(JDK 21).
 
-#### Prefilters
+CommandHelper 는 공개 Maven 저장소에 없으므로, Jenkins 에서 받은 full jar 를 로컬 Maven 저장소에 한 번 설치한다(`libs/` 에 둔 jar — 저장소에는 올리지 않는다):
 
-* **id**: String
-* **type**: Macro
+```
+.\mvnw.cmd install:install-file "-Dfile=libs/commandhelper-3.3.5-SNAPSHOT-full.jar" "-DgroupId=com.sk89q" "-DartifactId=commandhelper" "-Dversion=3.3.5-SNAPSHOT" "-Dclassifier=full" "-Dpackaging=jar"
+```
 
-#### Event Data
+받는 곳: https://letsbuild.net/jenkins/job/CommandHelper/lastSuccessfulBuild/artifact/target/commandhelper-3.3.5-SNAPSHOT-full.jar
 
-* **id:** The entityID
-* **type:** The type of entity removing.
+```
+.\mvnw.cmd package
+```
 
-### player_armor_change
+산출물 `target/chpaper-<버전>.jar` → 서버 `plugins/CommandHelper/extensions/` 에 넣는다(옛 CHPaper jar 는 반드시 뺀다 — 둘이 같이 로드된다).
 
-This event is called when a player's armor slot changes by any cause, including function.
+## 원본 문서
 
-#### Prefilters
+원본의 함수 · 이벤트 설명은 [`README.upstream.md`](README.upstream.md) 에 그대로 있다.
 
-* **player:** String
+## 라이선스
 
-#### Event Data
-
-* **player:** The player whose armor slot changed.
-* **olditem:** The item array for the old item (or null)
-* **newitem:** The item array for the new item (or null)
-* **slottype:** The armor slot changed (HEAD, CHEST, LEGS, FEET)
+**MIT** (`LICENSE` — 원본 그대로 · Copyright (c) 2019 Michael Smith).
