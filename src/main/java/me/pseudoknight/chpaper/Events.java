@@ -15,7 +15,7 @@ import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CString;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
-import com.laytonsmith.core.events.AbstractEvent;
+import com.laytonsmith.core.events.AbstractGenericEvent;
 import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.BoundEvent;
 import com.laytonsmith.core.events.Driver;
@@ -34,9 +34,8 @@ public class Events {
 	public static String docs() {
 		return "This augments CommandHelper with PaperSpigot-specific events";
 	}
-
 	@api
-	public static class beacon_effect extends AbstractEvent {
+	public static class beacon_effect extends AbstractGenericEvent<MCBeaconEffectEvent> {
 
 		@Override
 		public String getName() {
@@ -60,23 +59,22 @@ public class Events {
 		}
 
 		@Override
-		public BindableEvent convert(CArray manualObject, Target t) {
-			return null;
-		}
-
-		@Override
 		public Version since() {
 			return MSVersion.V3_3_2;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			return e instanceof MCBeaconEffectEvent;
+		public boolean matches(Map<String, Mixed> prefilter, MCBeaconEffectEvent event) throws PrefilterNonMatchException {
+			return true;
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			MCBeaconEffectEvent event = (MCBeaconEffectEvent) e;
+		public MCBeaconEffectEvent convert(CArray manualObject, Target t) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(MCBeaconEffectEvent event) throws EventException {
 			Map<String, Mixed> map = new HashMap<>();
 			Target t = Target.UNKNOWN;
 
@@ -86,7 +84,7 @@ public class Events {
 			CArray effect = CArray.GetAssociativeArray(t);
 			effect.set("id", new CInt(eff.getPotionEffectType().getId(), t), t);
 			effect.set("strength", new CInt(eff.getStrength(), t), t);
-			effect.set("seconds",  new CDouble(eff.getTicksRemaining() / 20.0, t), t);
+			effect.set("seconds", new CDouble(eff.getTicksRemaining() / 20.0, t), t);
 			effect.set("ambient", CBoolean.get(eff.isAmbient()), t);
 			effect.set("particles", CBoolean.get(eff.hasParticles()), t);
 			map.put("effect", effect);
@@ -95,9 +93,8 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
-			MCBeaconEffectEvent event = (MCBeaconEffectEvent)e;
-			if(key.equals("effect")){
+		public boolean modifyEvent(String key, Mixed value, MCBeaconEffectEvent event) {
+			if(key.equals("effect")) {
 				Target t = value.getTarget();
 				if(value instanceof CArray) {
 					CArray ca = (CArray) value;
@@ -106,7 +103,7 @@ public class Events {
 					double seconds = ArgumentValidation.getDouble(ca.get("seconds", t), t);
 					boolean ambient = ArgumentValidation.getBooleanObject(ca.get("ambient", t), t);
 					boolean particles = ArgumentValidation.getBooleanObject(ca.get("particles", t), t);
-					event.setEffect(id, strength, (int)(seconds * 20), ambient, particles);
+					event.setEffect(id, strength, (int) (seconds * 20), ambient, particles);
 					return true;
 				} else {
 					throw new CRECastException("Effect must be an array", t);
@@ -117,7 +114,7 @@ public class Events {
 	}
 
 	@api
-	public static class player_jump extends AbstractEvent {
+	public static class player_jump extends AbstractGenericEvent<MCPlayerJumpEvent> {
 
 		@Override
 		public String getName() {
@@ -140,21 +137,13 @@ public class Events {
 		}
 
 		@Override
-		public BindableEvent convert(CArray manualObject, Target t) {
-			return null;
-		}
-
-		@Override
 		public Version since() {
 			return MSVersion.V3_3_2;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(!(e instanceof MCPlayerJumpEvent)) {
-				return false;
-			}
-			MCPlayerJumpEvent event = (MCPlayerJumpEvent) e;
+		@Deprecated
+		public boolean matches(Map<String, Mixed> prefilter, MCPlayerJumpEvent event) throws PrefilterNonMatchException {
 			if(prefilter.containsKey("player")
 					&& !event.getPlayer().getName().equals(prefilter.get("player").val())) {
 				return false;
@@ -163,8 +152,12 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			MCPlayerJumpEvent event = (MCPlayerJumpEvent) e;
+		public MCPlayerJumpEvent convert(CArray manualObject, Target t) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(MCPlayerJumpEvent event) throws EventException {
 			Map<String, Mixed> map = new HashMap<>();
 			Target t = Target.UNKNOWN;
 
@@ -175,8 +168,7 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
-			MCPlayerJumpEvent event = (MCPlayerJumpEvent)e;
+		public boolean modifyEvent(String key, Mixed value, MCPlayerJumpEvent event) {
 			if(key.equals("from")){
 				Target t = value.getTarget();
 				event.setFrom(ObjectGenerator.GetGenerator().location(value, null, t));
@@ -187,7 +179,7 @@ public class Events {
 	}
 
 	@api
-	public static class player_armor_change extends AbstractEvent {
+	public static class player_armor_change extends AbstractGenericEvent<MCPlayerArmorChangeEvent> {
 
 		@Override
 		public String getName() {
@@ -211,21 +203,13 @@ public class Events {
 		}
 
 		@Override
-		public BindableEvent convert(CArray manualObject, Target t) {
-			return null;
-		}
-
-		@Override
 		public Version since() {
 			return MSVersion.V3_3_4;
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(!(e instanceof MCPlayerArmorChangeEvent)) {
-				return false;
-			}
-			MCPlayerArmorChangeEvent event = (MCPlayerArmorChangeEvent) e;
+		@Deprecated
+		public boolean matches(Map<String, Mixed> prefilter, MCPlayerArmorChangeEvent event) throws PrefilterNonMatchException {
 			if(prefilter.containsKey("player")
 					&& !event.getPlayer().getName().equals(prefilter.get("player").val())) {
 				return false;
@@ -234,26 +218,30 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			MCPlayerArmorChangeEvent event = (MCPlayerArmorChangeEvent) e;
+		public MCPlayerArmorChangeEvent convert(CArray manualObject, Target t) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(MCPlayerArmorChangeEvent event) throws EventException {
 			Map<String, Mixed> map = new HashMap<>();
 			Target t = Target.UNKNOWN;
 
 			map.put("player", new CString(event.getPlayer().getName(), t));
 			map.put("olditem", ObjectGenerator.GetGenerator().item(event.getOldItem(), t));
-			map.put("newitem",  ObjectGenerator.GetGenerator().item(event.getNewItem(), t));
+			map.put("newitem", ObjectGenerator.GetGenerator().item(event.getNewItem(), t));
 			map.put("slottype", new CString(event.getSlotType(), t));
 			return map;
 		}
 
 		@Override
-		public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
+		public boolean modifyEvent(String key, Mixed value, MCPlayerArmorChangeEvent event) {
 			return false;
 		}
 	}
 
 	@api
-	public static class player_elytra_boost extends AbstractEvent {
+	public static class player_elytra_boost extends AbstractGenericEvent<MCPlayerElytraBoostEvent> {
 
 		@Override
 		public String getName() {
@@ -271,11 +259,18 @@ public class Events {
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(!(e instanceof MCPlayerElytraBoostEvent)) {
-				return false;
-			}
-			MCPlayerElytraBoostEvent event = (MCPlayerElytraBoostEvent) e;
+		public Driver driver() {
+			return Driver.EXTENSION;
+		}
+
+		@Override
+		public Version since() {
+			return MSVersion.V3_3_4;
+		}
+
+		@Override
+		@Deprecated
+		public boolean matches(Map<String, Mixed> prefilter, MCPlayerElytraBoostEvent event) throws PrefilterNonMatchException {
 			if(prefilter.containsKey("player")
 					&& !event.getPlayer().getName().equals(prefilter.get("player").val())) {
 				return false;
@@ -284,8 +279,12 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			MCPlayerElytraBoostEvent event = (MCPlayerElytraBoostEvent) e;
+		public MCPlayerElytraBoostEvent convert(CArray manualObject, Target t) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(MCPlayerElytraBoostEvent event) throws EventException {
 			Map<String, Mixed> map = new HashMap<>();
 			Target t = Target.UNKNOWN;
 
@@ -297,8 +296,7 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
-			MCPlayerElytraBoostEvent event = (MCPlayerElytraBoostEvent)e;
+		public boolean modifyEvent(String key, Mixed value, MCPlayerElytraBoostEvent event) {
 			if(key.equals("consume")){
 				Target t = value.getTarget();
 				event.setConsumeItem(ArgumentValidation.getBooleanObject(value, t));
@@ -322,25 +320,10 @@ public class Events {
 				Static.UninjectEntity(entity);
 			}
 		}
-
-		@Override
-		public Driver driver() {
-			return Driver.EXTENSION;
-		}
-
-		@Override
-		public BindableEvent convert(CArray manualObject, Target t) {
-			return null;
-		}
-
-		@Override
-		public Version since() {
-			return MSVersion.V3_3_4;
-		}
 	}
 
 	@api
-	public static class entity_remove_from_world extends AbstractEvent {
+	public static class entity_remove_from_world extends AbstractGenericEvent<MCEntityRemoveFromWorldEvent> {
 
 		@Override
 		public String getName() {
@@ -357,12 +340,18 @@ public class Events {
 		}
 
 		@Override
-		public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-			if(!(e instanceof MCEntityRemoveFromWorldEvent)) {
-				return false;
-			}
-			MCEntityRemoveFromWorldEvent event = (MCEntityRemoveFromWorldEvent) e;
+		public Driver driver() {
+			return Driver.EXTENSION;
+		}
 
+		@Override
+		public Version since() {
+			return MSVersion.V3_3_4;
+		}
+
+		@Override
+		@Deprecated
+		public boolean matches(Map<String, Mixed> prefilter, MCEntityRemoveFromWorldEvent event) throws PrefilterNonMatchException {
 			if(prefilter.containsKey("id")) {
 				String id = prefilter.get("id").val();
 				if(!id.equals(event.getEntityUniqueId().toString())) {
@@ -375,8 +364,12 @@ public class Events {
 		}
 
 		@Override
-		public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
-			MCEntityRemoveFromWorldEvent event = (MCEntityRemoveFromWorldEvent) e;
+		public MCEntityRemoveFromWorldEvent convert(CArray manualObject, Target t) {
+			return null;
+		}
+
+		@Override
+		public Map<String, Mixed> evaluate(MCEntityRemoveFromWorldEvent event) throws EventException {
 			Map<String, Mixed> map = new HashMap<>();
 			Target t = Target.UNKNOWN;
 			map.put("type", new CString(event.getEntityType().name(), t));
@@ -385,8 +378,26 @@ public class Events {
 		}
 
 		@Override
-		public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
+		public boolean modifyEvent(String key, Mixed value, MCEntityRemoveFromWorldEvent event) {
 			return false;
+		}
+	}
+
+	@api
+	public static class entity_add_to_world extends AbstractGenericEvent<MCEntityAddToWorldEvent> {
+
+		@Override
+		public String getName() {
+			return "entity_add_to_world";
+		}
+
+		@Override
+		public String docs() {
+			return "{id: <string> The entityID | type: <macro> The type of entity being added.}"
+					+ " Fired any time an entity is being added to a world for any reason"
+					+ " {type | id: The entityID} "
+					+ "{} "
+					+ "{}";
 		}
 
 		@Override
@@ -395,13 +406,41 @@ public class Events {
 		}
 
 		@Override
-		public BindableEvent convert(CArray manualObject, Target t) {
+		public Version since() {
+			return MSVersion.V3_3_4;
+		}
+
+		@Override
+		@Deprecated
+		public boolean matches(Map<String, Mixed> prefilter, MCEntityAddToWorldEvent event) throws PrefilterNonMatchException {
+			if(prefilter.containsKey("id")) {
+				String id = prefilter.get("id").val();
+				if(!id.equals(event.getEntityUniqueId().toString())) {
+					return false;
+				}
+			}
+			Prefilters.match(prefilter, "type", event.getEntityType().name(), PrefilterType.MACRO);
+
+			return true;
+		}
+
+		@Override
+		public MCEntityAddToWorldEvent convert(CArray manualObject, Target t) {
 			return null;
 		}
 
 		@Override
-		public Version since() {
-			return MSVersion.V3_3_4;
+		public Map<String, Mixed> evaluate(MCEntityAddToWorldEvent event) throws EventException {
+			Map<String, Mixed> map = new HashMap<>();
+			Target t = Target.UNKNOWN;
+			map.put("type", new CString(event.getEntityType().name(), t));
+			map.put("id", new CString(event.getEntityUniqueId().toString(), t));
+			return map;
+		}
+
+		@Override
+		public boolean modifyEvent(String key, Mixed value, MCEntityAddToWorldEvent event) {
+			return false;
 		}
 	}
 }

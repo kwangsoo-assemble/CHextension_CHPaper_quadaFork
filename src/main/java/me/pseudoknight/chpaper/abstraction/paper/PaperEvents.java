@@ -2,6 +2,7 @@ package me.pseudoknight.chpaper.abstraction.paper;
 
 import com.destroystokyo.paper.event.block.BeaconEffectEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
@@ -199,4 +200,28 @@ public class PaperEvents {
 		}
 	}
 
+
+	@abstraction(type = Implementation.Type.BUKKIT)
+	public static class PaperEntityAddToWorldEvent implements MCEntityAddToWorldEvent {
+		EntityAddToWorldEvent e;
+
+		public PaperEntityAddToWorldEvent(Event e) {
+			this.e = (EntityAddToWorldEvent) e;
+		}
+
+		@Override
+		public UUID getEntityUniqueId() {
+			return e.getEntity().getUniqueId();
+		}
+
+		@Override
+		public MCEntityType<EntityType> getEntityType() {
+			return BukkitMCEntityType.valueOfConcrete(e.getEntityType());
+		}
+
+		@Override
+		public Object _GetObject() {
+			return e;
+		}
+	}
 }
