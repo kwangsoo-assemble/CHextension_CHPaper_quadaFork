@@ -10,7 +10,7 @@
 
 | Item | Value |
 |---|---|
-| Version | `0.4.4-but-ai-edited.1` — suffix added to tell it apart from upstream 0.4.4 |
+| Version | `0.4.4.2` — the fourth number after upstream 0.4.4 is this fork's own release number (first release: tag `0.4.4-but-ai-edited.1`) |
 | Based on | upstream `master` `b6eea66` |
 | CommandHelper | 3.3.5-SNAPSHOT (build 649 or later — `AbstractGenericEvent` API) |
 | Server | Paper-based 1.20.4+ (in use: Purpur 1.21.8) |
@@ -87,7 +87,7 @@ The upstream function and event documentation is kept as-is in [`README.upstream
 
 | 항목 | 값 |
 |---|---|
-| 버전 | `0.4.4-but-ai-edited.1` — 원본 0.4.4 와 구분하려고 붙인 꼬리 |
+| 버전 | `0.4.4.2` — 원본 0.4.4 뒤 넷째 자리가 이 포크의 판 번호(첫 판은 꼬리 `0.4.4-but-ai-edited.1`) |
 | 기준 | 원본 `master` `b6eea66` |
 | CommandHelper | 3.3.5-SNAPSHOT (빌드 649 이후 — `AbstractGenericEvent` API) |
 | 서버 | Paper 계열 1.20.4+ (실사용: Purpur 1.21.8) |

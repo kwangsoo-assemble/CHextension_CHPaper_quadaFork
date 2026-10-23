@@ -21,6 +21,6 @@ GitHub `kwangsoo-assemble/CHextension_CHPaper_quadaFork`(공개 · MIT) — 이 
 
 ## 버전
 
-- `pom.xml` `<version>` 이 정본 — 원본 버전 + 꼬리 `-but-ai-edited.N`(코드가 바뀌면 N+1 · 원본 버전이 바뀌면 원본을 따르고 `.1` 부터)
+- `pom.xml` `<version>` 이 정본 — 원본 버전 + 넷째 자리 `.N`(2026-10-23 M41 · 그 전 꼬리 `-but-ai-edited.N` · 코드가 바뀌면 N+1 · 원본 버전이 바뀌면 원본을 따르고 `.1` 부터)
 - `Extension.java` `SimpleVersion(0,4,4)` 는 숫자 셋만 받는다 — 원본 숫자를 따른다
 - 코드가 바뀌면 버전을 올리고 🎬 뒤 하네스 `repos.py release chpaper`
